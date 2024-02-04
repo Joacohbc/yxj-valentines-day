@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import './App.css';
 import { phrase } from './assets/phrases.js';
 
-const image = `/src/assets/${Math.floor(Math.random() * 7) + 1}.gif`;
+const image = `./assets/${Math.floor(Math.random() * 7) + 1}.gif`;
 const localStorageAccept = Boolean(localStorage.getItem('accept'));
 const localStorageLifes = localStorage.getItem('lifes');
 const LIFES = localStorageLifes ? localStorageLifes.split(',') : 'o'.repeat(8).split('');
@@ -52,7 +52,7 @@ export default function App() {
         <div className="flex items-center justify-center flex-col bg-rose-300 md:max-w-full md:h-screen md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
         <div className="flex items-center justify-center">
           {lifes.every(e => e === '×') ?
-            <img src='/src/assets/lose.gif' alt="San Valentin"/> 
+            <img src='./assets/lose.gif' alt="San Valentin"/> 
               : <img src={image} alt="San Valentin"/>}
         </div>
 
