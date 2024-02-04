@@ -30,6 +30,11 @@ export default function App() {
   }
 
   const no = () => {
+    if(accept) {
+      setAccept(false);
+      localStorage.setItem('accept', false);
+    }
+
     lifes[lifes.lastIndexOf('o')] = '×';
     localStorage.setItem('lifes', lifes);
     setLifes([...lifes]);
@@ -79,6 +84,11 @@ export default function App() {
         <div className="pb-3" hidden={accept}>
           <button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
               onClick={yes} hidden={!lifes.every(e => e === '×')}>o ¿Otra Oportunidad? o</button>
+        </div>
+
+        <div className="pb-3" hidden={!accept}>
+          <button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
+              onClick={no}>× ¿Cambiaste de opinion? ×</button>
         </div>
       </div>
     </div>
