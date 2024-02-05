@@ -70,7 +70,7 @@ export default function App() {
 
           {accept && <div className="text-rose-500 text-3xl md:text-6xl text text-center text-wrap yxj-font">I LOVE YOU</div>}
 
-          <div className="flex items-center justify-center my-3">
+          <div className={`flex items-center justify-center my-3 ${noIsDisabled && 'animate-shake animate-once'}`}>
             <LivesBar heart={lives} total={totalLives} />
           </div>
         </div>
