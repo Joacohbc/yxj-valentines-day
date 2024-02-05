@@ -4,8 +4,8 @@ import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 
 const lsAccept = localStorage.getItem('accept') === 'true';
-const lsLives = localStorage.getItem('lives') ? parseInt(localStorage.getItem('lives')) : 8;
 const totalLives = 8;
+const lsLives = localStorage.getItem('lives') ? parseInt(localStorage.getItem('lives')) : totalLives;
 
 export default function App() {
 
@@ -58,17 +58,17 @@ export default function App() {
     <div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
       <div className="flex items-center justify-center flex-col bg-rose-300 md:max-w-full md:h-screen md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
         <div className="flex items-center justify-center">
-          {lives === 0 ?
-            <img src={`/src/assets/lose.gif?q='${Date.now()}`} alt="No San Valentin </3" />
-            : <img src={`/src/assets/${lives}.gif?q=${Date.now()}`} alt="San Valentin <3" />}
+          {!accept && lives == 0 && <img src={`/src/assets/lose.gif?q='${Date.now()}`} alt="No San Valentin </3" />}
+          {!accept && lives != 0 && <img src={`/src/assets/${lives}.gif?q=${Date.now()}`} alt="San Valentin <3" />}
+          {accept && <img src={`/src/assets/win.gif?q=${Date.now()}`} alt="San Valentin <3" />}
         </div>
 
         <div className="flex flex-col items-center my-3">
           {!accept && lives != 0 && <div className="text-rose-500 text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-          {!accept && lives == 0 && <div className="text-rose-500 text-3xl md:text-6xl text text-center yxj-font"> Okey... </div>}
+          {!accept && lives == 0 && <div className="text-rose-500 text-3xl md:text-6xl text text-center yxj-font">Okey...</div>}
 
-          {accept && <div className="text-rose-500 text-3xl md:text-6xl text text-center text-wrap yxj-font"> I LOVE YOU </div>}
+          {accept && <div className="text-rose-500 text-3xl md:text-6xl text text-center text-wrap yxj-font">I LOVE YOU</div>}
 
           <div className="flex items-center justify-center my-3">
             <LivesBar heart={lives} total={totalLives} />
@@ -80,7 +80,7 @@ export default function App() {
             onClick={yes}>o SI o</button>
         </div>}
         
-        {!accept && lives != 0 && <div className="pb-3">
+        {!accept && lives != 0 && <div className="pb-3 max-w-md">
           <button ref={noRef} className={`${!noIsDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} text-white text-wrap font-bold py-2 px-4 mx-4 mb-2 md:py-3 md:px-6 rounded-md yxj-font`}
             onClick={no} disabled={noIsDisabled}>× NO ×</button>
         </div>}
