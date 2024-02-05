@@ -13,7 +13,8 @@ export default function App() {
   const [ lives, setLives ] = useState(lsLives);
   const [ accept, setAccept ] = useState(lsAccept);
   const [ noIsDisabled, setNoDisabled ] = useState(false);
-
+  const [ prevSelected, setPrevSelected ] = useState(0);
+  
   const yes = () => {
     if(accept) return;
 
@@ -34,15 +35,23 @@ export default function App() {
       localStorage.setItem('accept', false);
     }
 
+    // Don't allow to select the same phrase twice in a row
+    const selected = Math.floor(Math.random() * phrase.length);
+    if (selected === prevSelected) {
+      no();
+      return
+    }
+    setPrevSelected(selected);
+
     setLives(lives - 1);
     localStorage.setItem('lives', lives - 1);
 
-    noRef.current.innerHTML = '× ' + phrase[Math.floor(Math.random() * phrase.length)].toUpperCase() + ' ×';
-    
+    noRef.current.innerHTML = '× ' + phrase[selected].toUpperCase() + ' ×';
+
     setNoDisabled(true);
     setTimeout(() => {
       setNoDisabled(false);
-    }, 500 * lives);
+    }, 200 * totalLives - lives);
   }
 
   return (
@@ -72,7 +81,7 @@ export default function App() {
         </div>}
         
         {!accept && lives != 0 && <div className="pb-3">
-          <button ref={noRef} className={`${!noIsDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} text-white font-bold py-2 px-4 mx-4 mb-2 md:py-3 md:px-6 rounded-md yxj-font`}
+          <button ref={noRef} className={`${!noIsDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} text-white text-wrap font-bold py-2 px-4 mx-4 mb-2 md:py-3 md:px-6 rounded-md yxj-font`}
             onClick={no} disabled={noIsDisabled}>× NO ×</button>
         </div>}
 
@@ -81,10 +90,10 @@ export default function App() {
             onClick={yes}>o ¿Otra Oportunidad? o</button>
         </div>}
 
-        {accept && <div className="pb-3">
+        {/* {accept && <div className="pb-3">
           <button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
             onClick={no}>× ¿Cambiaste de opinion? ×</button>
-        </div>}
+        </div>} */}
       </div>
     </div>
   )
