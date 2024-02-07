@@ -5,16 +5,13 @@ import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
 
 
-const lsAccept = localStorage.getItem('accept') === 'true';
-const totalLives = 8;
-const lsLives = localStorage.getItem('lives') ? parseInt(localStorage.getItem('lives')) : totalLives;
-
 const YES_BUTTON_CLASS = 'bg-rose-400 hover:bg-red-500 text-rose-100 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font';
 const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font`;
 
+const totalLives = 8;
 const initialState = {
-	accept: lsAccept,
-	lives: lsLives,
+	accept: false,
+	lives: totalLives,
 	gifs: GIFs()
 };
 
