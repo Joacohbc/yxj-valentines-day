@@ -3,6 +3,7 @@ import { phrase } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
+import { avoidClickNo1, avoidClickNo2 } from "./components/NoButonsVariants.jsx";
 
 
 const YES_BUTTON_CLASS = 'bg-rose-400 hover:bg-red-500 text-rose-100 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font';
@@ -18,13 +19,13 @@ const initialState = {
 function reducer(state, action) {
 	// Reset the selected gif
 	const gifs = GIFs();
-		
+
 	switch (action.type) {
 		case 'WIN': {
 			gifs.win.selected = true;
 			localStorage.setItem('lives', 8);
 			localStorage.setItem('accept', true);
-			return { ...state, lives: 8, gifs: gifs, accept: true};
+			return { ...state, lives: 8, gifs: gifs, accept: true };
 		}
 
 		case 'ADD': {
@@ -32,7 +33,7 @@ function reducer(state, action) {
 			gifs[lives].selected = true;
 			localStorage.setItem('lives', lives);
 			localStorage.setItem('accept', false);
-			return { ...state, lives: lives, gifs: gifs, accept: false};
+			return { ...state, lives: lives, gifs: gifs, accept: false };
 		}
 
 		case 'REMOVE': {
@@ -40,38 +41,38 @@ function reducer(state, action) {
 			gifs[lives].selected = true;
 			localStorage.setItem('lives', lives);
 			localStorage.setItem('accept', false);
-			return { ...state, lives: lives, gifs: gifs, accept: false};
+			return { ...state, lives: lives, gifs: gifs, accept: false };
 		}
 
 		case 'LOSE': {
 			gifs.lose.selected = true;
 			localStorage.setItem('lives', 0);
 			localStorage.setItem('accept', false);
-			return { ...state, lives: 0, gifs: gifs, accept: false};
+			return { ...state, lives: 0, gifs: gifs, accept: false };
 		}
 
-		case 'NO_ACCEPT': 
-			return { ...state, accept: false};
-		
-			
+		case 'NO_ACCEPT':
+			return { ...state, accept: false };
+
+
 		case 'RESET':
 			gifs[8].selected = true;
-			return { ...state, lives: 8, gifs: gifs, accept: false};
+			return { ...state, lives: 8, gifs: gifs, accept: false };
 
 		case 'LOAD': {
 			const totalLives = 8;
 			const lsAccept = localStorage.getItem('accept') === 'true';
 			const lsLives = localStorage.getItem('lives') ? parseInt(localStorage.getItem('lives')) : totalLives;
 
-			if(lsAccept) {
+			if (lsAccept) {
 				gifs.win.selected = true;
 			}
 
-			if(!lsAccept && lsLives == 0) {
+			if (!lsAccept && lsLives == 0) {
 				gifs.lose.selected = true;
 			}
 
-			if(lsLives > 0 && lsLives <= totalLives && !lsAccept) {
+			if (lsLives > 0 && lsLives <= totalLives && !lsAccept) {
 				gifs[lsLives].selected = true;
 			}
 
@@ -88,12 +89,8 @@ export default function App() {
 	const [noIsDisabled, setNoDisabled] = useState(false);
 	const [prevSelected, setPrevSelected] = useState(0);
 
-	const [state, dispatch ] = useReducer(reducer, initialState);
+	const [state, dispatch] = useReducer(reducer, initialState);
 	const { accept, lives, gifs } = state;
-
-	useEffect(() => {
-		dispatch({ type: 'LOAD' });
-	}, [ dispatch ]);
 
 	const yes = useCallback(() => {
 		console.log('yes');
@@ -106,12 +103,11 @@ export default function App() {
 		}
 
 		dispatch({ type: 'ADD' });
-		noRef.current.innerHTML = '× NO ×';
-	}, [ accept, lives, dispatch ]);
+	}, [accept, lives, dispatch]);
 
 	const no = useCallback(() => {
 		console.log('no');
-		
+
 		if (accept) {
 			dispatch({ type: 'NO_ACCEPT' });
 		}
@@ -123,7 +119,7 @@ export default function App() {
 		}
 		setPrevSelected(selected);
 
-		dispatch({ type: 'REMOVE' });
+		dispatch(lives - 1 === 0 ? { type: 'LOSE' } : { type: 'REMOVE' });
 
 		noRef.current.innerHTML = '× ' + phrase[selected].toUpperCase() + ' ×';
 
@@ -131,68 +127,50 @@ export default function App() {
 		setTimeout(() => {
 			setNoDisabled(false);
 		}, 200 * totalLives - lives);
+	}, [ accept, lives, prevSelected, dispatch ]);
 
-	}, [ accept, lives, setNoDisabled, prevSelected, setPrevSelected ]);
+	const styleReset = useCallback(() => {
+		noRef.current.className = NO_BUTTON_CLASS(noIsDisabled);
+		noRef.current.style.transition = 'all 0.2s ease-in-out';
+		noRef.current.style = {};
+	}, [ noRef, noIsDisabled ]);
 
+	useEffect(() => {
+		dispatch({ type: 'LOAD' });
 
-	const avoidClickNo = useCallback((event) => {
-		let toutId;
-		let repeatTime = 0;
-
-		return () => {
-			console.log('avoidClickNo', event, repeatTime);
-
-			if (event === 'enter') {
-				if (lives - 2 == 0 && repeatTime <= 5) {
-					noRef.current.className = "mb-2 animate-wiggle animate-once " + YES_BUTTON_CLASS;
-					noRef.current.innerHTML = 'o DALE QUE SI! o';
-					noRef.current.onclick = yes;
-					repeatTime++;
-					return;
-				}
-
-				if (lives - 1 == 0 && repeatTime <= 15 + 5) {
-					noRef.current.style.position = 'absolute';
-					noRef.current.style.left = Math.random() * 100 + '%';
-					noRef.current.style.top = Math.random() * 100 + '%';
-					noRef.current.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
-					noRef.current.style.transition = 'all 0.2s ease-in-out';
-					noRef.current.innerHTML = 'Intenta otra vez c:';
-					noRef.current.onclick = null;
-					repeatTime++;
-
-					clearTimeout(toutId);
-					toutId = setTimeout(() => {
-						if (lives - 1 == 0 && noRef.current.style) {
-							noRef.current.style.position = 'relative';
-							noRef.current.style.left = 'auto';
-							noRef.current.style.top = 'auto';
-							noRef.current.style.transform = 'rotate(0deg)';
-							noRef.current.style.transition = 'all 0.5s ease-in-out';
-							noRef.current.innerHTML = '× NO ×';
-						}
-					}, 3000);
-					return;
-				}
-			}
-
-			if (event === 'out') {
-				if (lives - 2 == 0) {
-					noRef.current.className = NO_BUTTON_CLASS(noIsDisabled);
-					noRef.current.style.transition = 'all 0.2s ease-in-out';
-					noRef.current.innerHTML = '× NO ×';
-					noRef.current.onclick = no;
-				}
-			}
+		if(lives >= 3) {
+			styleReset();
+			noRef.current.onmouseover = null;
+			noRef.current.onmouseout = null;
+			noRef.current.ontouchstart = null;
+			noRef.current.ontouchcancel = null;
+			noRef.current.onclick = no;
+			return;
 		}
-	}, [lives, noRef, yes, no, noIsDisabled ]);
+		
+		if(lives == 2) {
+			noRef.current.onclick = null;
+			noRef.current.onmouseover = avoidClickNo2('enter', noRef, no, yes, noIsDisabled, styleReset);
+			noRef.current.onmouseout = avoidClickNo2('out', noRef, no, yes, noIsDisabled, styleReset);
+			noRef.current.ontouchstart = null;
+			noRef.current.ontouchcancel = null;
+			return;
+		}
 
-
+		if(lives == 1) {
+			noRef.current.onmouseover = avoidClickNo1('enter', noRef, no, yes, noIsDisabled, styleReset);
+			noRef.current.onmouseout = avoidClickNo1('out', noRef, no, yes, noIsDisabled, styleReset);
+			noRef.current.ontouchstart = null;
+			noRef.current.ontouchcancel = null;
+			return;
+		}
+	}, [ lives, noRef, no, yes, noIsDisabled, styleReset ]);
+		
 	return (
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
 			<div className="flex items-center justify-center flex-col bg-rose-300 md:max-w-full md:h-screen md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
-				
-				<GifCarrusel gifs={gifs.toArray()}/>
+
+				<GifCarrusel gifs={gifs.toArray()} />
 
 				<div className="flex flex-col items-center my-3">
 					{!accept && lives != 0 && <div className="text-rose-500 text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
@@ -214,11 +192,11 @@ export default function App() {
 				{!accept && lives != 0 &&
 					<button ref={noRef}
 						className={NO_BUTTON_CLASS(noIsDisabled)}
-						onMouseOver={avoidClickNo('enter')}
-						onMouseOut={avoidClickNo('out')}
-						onTouchStart={avoidClickNo('enter')}
-						onTouchCancel={avoidClickNo('out')}
-						onClick={no}
+						// onMouseOver={avoidClickNo('enter')}
+						// onMouseOut={avoidClickNo('out')}
+						// onTouchStart={avoidClickNo('enter')}
+						// onTouchCancel={avoidClickNo('out')}
+						// onClick={no}
 						disabled={noIsDisabled}>× NO ×</button>}
 
 				{lives == 0 && <div className="pb-3">
