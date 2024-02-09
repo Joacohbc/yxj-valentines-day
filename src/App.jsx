@@ -3,13 +3,10 @@ import { phrase } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
-import { avoidClickNo1, avoidClickNo2 } from "./components/NoButonsVariants.jsx";
-
-
-const YES_BUTTON_CLASS = 'bg-rose-400 hover:bg-red-500 text-rose-100 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font';
-const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font`;
+import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2 } from "./components/NoButonsVariants.jsx";
 
 const totalLives = 8;
+
 const initialState = {
 	accept: false,
 	lives: totalLives,
@@ -86,15 +83,13 @@ function reducer(state, action) {
 export default function App() {
 
 	const noRef = useRef(null);
-	const [noIsDisabled, setNoDisabled] = useState(false);
+	const [ noIsDisabled, setNoDisabled ] = useState(false);
 	const [prevSelected, setPrevSelected] = useState(0);
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const { accept, lives, gifs } = state;
 
 	const yes = useCallback(() => {
-		console.log('yes');
-
 		if (accept) return;
 
 		if (lives === totalLives) {
@@ -106,8 +101,6 @@ export default function App() {
 	}, [accept, lives, dispatch]);
 
 	const no = useCallback(() => {
-		console.log('no');
-
 		if (accept) {
 			dispatch({ type: 'NO_ACCEPT' });
 		}
@@ -127,44 +120,61 @@ export default function App() {
 		setTimeout(() => {
 			setNoDisabled(false);
 		}, 200 * totalLives - lives);
+
 	}, [ accept, lives, prevSelected, dispatch ]);
 
-	const styleReset = useCallback(() => {
-		noRef.current.className = NO_BUTTON_CLASS(noIsDisabled);
-		noRef.current.style.transition = 'all 0.2s ease-in-out';
-		noRef.current.style = {};
-	}, [ noRef, noIsDisabled ]);
+	const reset = useCallback((resetOf) => {
+		if(!noRef.current) return;
 
-	useEffect(() => {
-		dispatch({ type: 'LOAD' });
+		const resets = Array.from(resetOf);
 
-		if(lives >= 3) {
-			styleReset();
+		if(resets.includes('events')) {
 			noRef.current.onmouseover = null;
 			noRef.current.onmouseout = null;
 			noRef.current.ontouchstart = null;
 			noRef.current.ontouchcancel = null;
-			noRef.current.onclick = no;
-			return;
-		}
-		
-		if(lives == 2) {
 			noRef.current.onclick = null;
-			noRef.current.onmouseover = avoidClickNo2('enter', noRef, no, yes, noIsDisabled, styleReset);
-			noRef.current.onmouseout = avoidClickNo2('out', noRef, no, yes, noIsDisabled, styleReset);
-			noRef.current.ontouchstart = null;
-			noRef.current.ontouchcancel = null;
-			return;
 		}
 
-		if(lives == 1) {
-			noRef.current.onmouseover = avoidClickNo1('enter', noRef, no, yes, noIsDisabled, styleReset);
-			noRef.current.onmouseout = avoidClickNo1('out', noRef, no, yes, noIsDisabled, styleReset);
-			noRef.current.ontouchstart = null;
-			noRef.current.ontouchcancel = null;
-			return;
+		if(resets.includes('style')) {
+			noRef.current.className = NO_BUTTON_CLASS(false);
+			noRef.current.style = {};
+
+			// Transition is set make smooth the transition from avoidClickNo functions
+			noRef.current.style.transition = 'all 0.2s ease-in-out';
 		}
-	}, [ lives, noRef, no, yes, noIsDisabled, styleReset ]);
+
+		if(resets.includes('text')) {
+			noRef.current.innerHTML = '× NO ×';
+		}
+
+	}, [ noRef ]);
+
+	useEffect(() => {
+		dispatch({ type: 'LOAD' });
+
+		const currentRef = noRef.current;
+
+		if(lives >= 3) {
+			reset([ 'events' ]);
+			currentRef.onclick = no;
+			return;
+		} else if(lives == 2) {
+			currentRef.onclick = null;
+			currentRef.onmouseover = avoidClickNo2('enter', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.onmouseout = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.ontouchstart = null;
+			currentRef.ontouchcancel = null;
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		} else if(lives == 1) {
+			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.ontouchstart = null;
+			currentRef.ontouchcancel = null;
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		}
+
+	}, [ lives, noRef, no, yes, noIsDisabled, reset]);
 		
 	return (
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
@@ -192,22 +202,12 @@ export default function App() {
 				{!accept && lives != 0 &&
 					<button ref={noRef}
 						className={NO_BUTTON_CLASS(noIsDisabled)}
-						// onMouseOver={avoidClickNo('enter')}
-						// onMouseOut={avoidClickNo('out')}
-						// onTouchStart={avoidClickNo('enter')}
-						// onTouchCancel={avoidClickNo('out')}
-						// onClick={no}
 						disabled={noIsDisabled}>× NO ×</button>}
 
 				{lives == 0 && <div className="pb-3">
 					<button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
 						onClick={yes}>o ¿Otra Oportunidad? o</button>
 				</div>}
-
-				{/* {accept && <div className="pb-3">
-					<button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
-						onClick={no}>× ¿Cambiaste de opinion? ×</button>
-				</div>} */}
 			</div>
 		</div>
 	)
