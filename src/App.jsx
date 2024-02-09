@@ -3,7 +3,7 @@ import { phrase } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
-import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2, avoidClickNo3 } from "./components/NoButonsVariants.jsx";
+import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 
 const totalLives = 8;
 
@@ -81,6 +81,8 @@ function reducer(state, action) {
 }
 
 export default function App() {
+	console.log('App');
+
 
 	const noRef = useRef(null);
 	const [ noIsDisabled, setNoDisabled ] = useState(false);
@@ -155,12 +157,16 @@ export default function App() {
 
 		const currentRef = noRef.current;
 
-		if(lives >= 4) {
+		if(lives >= 5) {
 			reset([ 'events' ]);
 			currentRef.onclick = no;
 			return;
+		} else if(lives == 4) {
+			currentRef.onclick = avoidClickNo4('click', currentRef, no, yes, noIsDisabled, reset);
+			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 3) {
-			avoidClickNo3('click', currentRef, no, yes, noIsDisabled, reset);
+			// TODO: onBlur de la app que se reseten los valores para que tenga que ser mental
+			currentRef.onclick = avoidClickNo3('click', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 2) {
 			currentRef.onclick = null;
