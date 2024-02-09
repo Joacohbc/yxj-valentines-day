@@ -71,6 +71,13 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
     let operation = [ '+', '-', '*' ][Math.floor(Math.random() * 3)];
     let result = eval(`${num1} ${operation} ${num2}`);
 
+    // Avoid the 0 result (because is no detected as a change in the input field)
+    while(result == 0) {
+        num1 = Math.floor(Math.random() * 10);
+        num2 = Math.floor(Math.random() * 10 + 1);
+        operation = [ '+', '-', '*' ][Math.floor(Math.random() * 3)];
+        result = eval(`${num1} ${operation} ${num2}`);
+    }
 
     const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
@@ -79,19 +86,23 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
 
     noRef.innerHTML = `× ${num1} ${operation} ${num2} = <input id=${id} type="number" style="color:black; border: 1px solid gray; padding: 5px; border-radius: 5px;"> ? ×`;
     document.getElementById(id).value = 0;
+    document.getElementById(id).focus();
 
     document.getElementById(id).onchange = () => {
-        console.log('avoidClickNo3', document.getElementById(id).value, result);
         if (document.getElementById(id).value === result.toString()) {
             noRef.innerHTML = `× Voe que note saltaste las tablas en la escuela ×`;
             noRef.onclick = no;
+        } else {
+            // Change the operation if the result is wrong
+            noRef.className = "animate-shake animate-once " + NO_BUTTON_CLASS(isDisabled);
+            avoidClickNo3('click', noRef, no, yes, isDisabled, reset);
         }
     }
 }
 
 export const avoidClickNo2 = (event, noRef, no, yes, isDisabled, reset) => {
     let repeatTime = 0;
-
+    
     return () => {
         console.log('avoidClickNo2', event, repeatTime);
 

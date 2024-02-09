@@ -80,10 +80,9 @@ function reducer(state, action) {
 	}
 }
 
+// TODO: Apenas abrir que muestre un Dialog que explique mas o menos la dinamica del juego (a apatir de la 4 hay retos)
 export default function App() {
-	console.log('App');
-
-
+	
 	const noRef = useRef(null);
 	const [ noIsDisabled, setNoDisabled ] = useState(false);
 	const [prevSelected, setPrevSelected] = useState(0);
