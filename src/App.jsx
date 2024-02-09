@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { phrase } from './assets/phrases.js';
+import { phrases } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
-import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
+import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 
 const totalLives = 8;
 
@@ -80,13 +80,12 @@ function reducer(state, action) {
 	}
 }
 
-// TODO: Apenas abrir que muestre un Dialog que explique mas o menos la dinamica del juego (a apatir de la 4 hay retos)
+// TODO: Apenas abrir que muestre un Dialog que explique mas o menos la dinámica del juego (a aparir de la 4 hay retos)
 export default function App() {
 	
 	const noRef = useRef(null);
 	const [ noIsDisabled, setNoDisabled ] = useState(false);
-	const [prevSelected, setPrevSelected] = useState(0);
-
+	
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const { accept, lives, gifs } = state;
 
@@ -106,23 +105,8 @@ export default function App() {
 			dispatch({ type: 'NO_ACCEPT' });
 		}
 
-		// Don't allow to select the same phrase twice in a row
-		let selected = Math.floor(Math.random() * 1);
-		while (selected === prevSelected) {
-			selected = Math.floor(Math.random() * phrase.length);
-		}
-		setPrevSelected(selected);
-
 		dispatch(lives - 1 === 0 ? { type: 'LOSE' } : { type: 'REMOVE' });
-
-		noRef.current.innerHTML = '× ' + phrase[selected].toUpperCase() + ' ×';
-
-		setNoDisabled(true);
-		setTimeout(() => {
-			setNoDisabled(false);
-		}, 200 * totalLives - lives);
-
-	}, [ accept, lives, prevSelected, dispatch ]);
+	}, [ accept, lives, dispatch ]);
 
 	const reset = useCallback((resetOf) => {
 		if(!noRef.current) return;
@@ -156,15 +140,26 @@ export default function App() {
 
 		const currentRef = noRef.current;
 
-		if(lives >= 5) {
+		if(lives == 8 && accept) {
 			reset([ 'events' ]);
-			currentRef.onclick = no;
 			return;
+		} else if(lives == 8) {	
+			currentRef.onclick = avoidClickNo(0, currentRef, no, setNoDisabled);
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		} else if(lives == 7) {
+			currentRef.onclick = avoidClickNo(1, currentRef, no, setNoDisabled);
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		} else if(lives == 6) {
+			currentRef.onclick = avoidClickNo(2, currentRef, no, setNoDisabled);
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		} else if(lives == 5) {
+			currentRef.onclick = avoidClickNo(3, currentRef, no, setNoDisabled);
+			return () => { reset([ 'events', 'style', 'text' ]); }
+		
 		} else if(lives == 4) {
 			currentRef.onclick = avoidClickNo4('click', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 3) {
-			// TODO: onBlur de la app que se reseten los valores para que tenga que ser mental
 			currentRef.onclick = avoidClickNo3('click', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 2) {
@@ -175,6 +170,7 @@ export default function App() {
 			currentRef.ontouchend = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 1) {
+			currentRef.onclick = avoidClickNo1('click', currentRef, no, yes, noIsDisabled, reset);
 			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
 			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
 			currentRef.ontouchstart = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
@@ -182,7 +178,7 @@ export default function App() {
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		}
 
-	}, [ lives, noRef, no, yes, noIsDisabled, reset]);
+	}, [ lives, noRef, no, yes, noIsDisabled, reset, accept ]);
 		
 	return (
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
@@ -193,7 +189,7 @@ export default function App() {
 				<div className="flex flex-col items-center my-3">
 					{!accept && lives != 0 && <div className="text-rose-500 text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-					{!accept && lives == 0 && <div className="text-rose-500 text-3xl md:text-6xl text text-center yxj-font">Okey... No sigo mas :c</div>}
+					{!accept && lives == 0 && <div className="text-rose-500 text-3xl md:text-6xl max-w-96 text-wrap text-center yxj-font"> Okey... ya entendí que no</div>}
 
 					{accept && <div className="text-rose-500 text-3xl md:text-6xl text text-center text-wrap yxj-font">I LOVE YOU</div>}
 

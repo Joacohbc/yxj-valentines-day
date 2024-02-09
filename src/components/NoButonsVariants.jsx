@@ -1,3 +1,4 @@
+import { phrases } from "../assets/phrases";
 
 export const YES_BUTTON_CLASS = 'bg-rose-400 hover:bg-red-500 text-rose-100 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font';
 export const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font`;
@@ -7,6 +8,20 @@ export const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hov
 // because all 'events' (mouseEnter, mouseOut) are independent but need to share the same repeatTime
 //
 
+export const avoidClickNo = (index, noRef, no) => {
+    if(index == 0) noRef.innerHTML = '× NO ×';
+    else noRef.innerHTML = phrases[index - 1].text.toUpperCase();
+
+    return () => {
+        noRef.className = NO_BUTTON_CLASS(true);
+        noRef.onclick = null;
+        noRef.innerHTML  = phrases[index].text.toUpperCase();
+        
+        setTimeout(() => {
+            no();
+        }, phrases[index].ms);
+    };
+}
 
 export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
     let clickTime = 20;
@@ -57,7 +72,6 @@ export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
         }
 
         if (event === 'click') {
-            console.log('avoidClickNo4', clickTime);
             noRef.innerHTML = ` × Da ${clickTime} para desbloquear el NO ×`;
             noRef.className = 'max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font ' + colorClass(clickTime);
             clickTime--;
@@ -103,18 +117,22 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
 export const avoidClickNo2 = (event, noRef, no, yes, isDisabled, reset) => {
     let repeatTime = 0;
     
-    return () => {
-        console.log('avoidClickNo2', event, repeatTime);
 
+    noRef.style.transition = 'all 2.5s ease-in-out';
+    noRef.className = "text-black mb-3 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font";
+    noRef.innerHTML = 'ALÉJATE DEL NO QUE DESAPARECE! :C';
+    
+    return () => {
         if(repeatTime > 5) {
-            reset([ 'style', 'text', 'event' ]);
+            reset([ 'style', 'event', 'text' ]);
             noRef.onclick = no;
             return;
         }
 
         if (event === 'enter') {
+            noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.className = "mb-2 animate-wiggle animate-once " + YES_BUTTON_CLASS;
-            noRef.innerHTML = 'o DALE QUE SI! o';
+            noRef.innerHTML = 'o TE ENGAÑE, YA NO PUEDES DAR NO! o';
             noRef.onclick = yes;
             repeatTime++;
             return;
@@ -135,27 +153,17 @@ export const avoidClickNo1 = (event, noRef, no, yes, isDisabled, reset) => {
     let toutId = null;
 
     return () => {
-        console.log('avoidClickNo1', event, repeatTime);
-
         if(event == 'enter' && repeatTime > 10) {
             reset([ 'style', 'text', 'event' ]);
             noRef.onclick = no;
             return;
         }
 
-        if(event == 'enter') {
+        if(event == 'enter' || event == 'click') {
             noRef.className = NO_BUTTON_CLASS(isDisabled);
             noRef.style.position = 'absolute';
-            
-            const getRandomPosition = () => {
-                const left = Math.random() * (window.innerWidth - 90);
-                const top = Math.random() * (window.innerHeight - 90);
-                return { left, top };
-            };
-
-            const position = getRandomPosition();
-            noRef.style.left = position.left + 'px';
-            noRef.style.top = position.top + 'px';
+            noRef.style.left = Math.random() * 95 + '%';
+            noRef.style.top = Math.random() * 95 + '%';
             noRef.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
             noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.innerHTML = 'Intenta otra vez c:';
