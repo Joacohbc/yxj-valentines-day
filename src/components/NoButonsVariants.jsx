@@ -7,6 +7,31 @@ export const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hov
 // because all 'events' (mouseEnter, mouseOut) are independent but need to share the same repeatTime
 //
 
+
+export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
+    const num1 = Math.floor(Math.random() * 10);
+    const num2 = Math.floor(Math.random() * 10 + 1);
+    const operation = [ '+', '-', '*' ][Math.floor(Math.random() * 3)];
+    const result = eval(`${num1} ${operation} ${num2}`);
+
+
+    const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+    noRef.style.transition = 'all 0.2s ease-in-out';
+    noRef.onclick = null;
+
+    noRef.innerHTML = `× ${num1} ${operation} ${num2} = <input id=${id} type="number" style="color:black; border: 1px solid gray; padding: 5px; border-radius: 5px;"> ? ×`;
+    document.getElementById(id).value = 0;
+
+    document.getElementById(id).onchange = () => {
+        console.log('avoidClickNo3', document.getElementById(id).value, result);
+        if (document.getElementById(id).value === result.toString()) {
+            noRef.innerHTML = `× Voe que note saltaste las tablas en la escuela ×`;
+            noRef.onclick = no;
+        }
+    }
+}
+
 export const avoidClickNo2 = (event, noRef, no, yes, isDisabled, reset) => {
     let repeatTime = 0;
 
@@ -44,7 +69,7 @@ export const avoidClickNo1 = (event, noRef, no, yes, isDisabled, reset) => {
     return () => {
         console.log('avoidClickNo1', event, repeatTime);
 
-        if(event == 'enter' && repeatTime > 15) {
+        if(event == 'enter' && repeatTime > 10) {
             reset([ 'style', 'text', 'event' ]);
             noRef.onclick = no;
             return;
@@ -53,8 +78,16 @@ export const avoidClickNo1 = (event, noRef, no, yes, isDisabled, reset) => {
         if(event == 'enter') {
             noRef.className = NO_BUTTON_CLASS(isDisabled);
             noRef.style.position = 'absolute';
-            noRef.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-            noRef.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            
+            const getRandomPosition = () => {
+                const left = Math.random() * (window.innerWidth - 90);
+                const top = Math.random() * (window.innerHeight - 90);
+                return { left, top };
+            };
+
+            const position = getRandomPosition();
+            noRef.style.left = position.left + 'px';
+            noRef.style.top = position.top + 'px';
             noRef.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
             noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.innerHTML = 'Intenta otra vez c:';

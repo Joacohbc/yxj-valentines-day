@@ -3,7 +3,7 @@ import { phrase } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
-import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2 } from "./components/NoButonsVariants.jsx";
+import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo1, avoidClickNo2, avoidClickNo3 } from "./components/NoButonsVariants.jsx";
 
 const totalLives = 8;
 
@@ -132,7 +132,7 @@ export default function App() {
 			noRef.current.onmouseover = null;
 			noRef.current.onmouseout = null;
 			noRef.current.ontouchstart = null;
-			noRef.current.ontouchcancel = null;
+			noRef.current.ontouchend = null;
 			noRef.current.onclick = null;
 		}
 
@@ -155,22 +155,25 @@ export default function App() {
 
 		const currentRef = noRef.current;
 
-		if(lives >= 3) {
+		if(lives >= 4) {
 			reset([ 'events' ]);
 			currentRef.onclick = no;
 			return;
+		} else if(lives == 3) {
+			avoidClickNo3('click', currentRef, no, yes, noIsDisabled, reset);
+			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 2) {
 			currentRef.onclick = null;
 			currentRef.onmouseover = avoidClickNo2('enter', currentRef, no, yes, noIsDisabled, reset);
 			currentRef.onmouseout = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchstart = null;
-			currentRef.ontouchcancel = null;
+			currentRef.ontouchstart = avoidClickNo2('enter', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.ontouchend = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		} else if(lives == 1) {
 			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
 			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchstart = null;
-			currentRef.ontouchcancel = null;
+			currentRef.ontouchstart = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
+			currentRef.ontouchend = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
 			return () => { reset([ 'events', 'style', 'text' ]); }
 		}
 
