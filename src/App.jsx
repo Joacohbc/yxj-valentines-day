@@ -186,6 +186,8 @@ export default function App() {
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
 			<div className="flex items-center justify-center flex-col bg-rose-300 max-w-[95vw] min-h-[80vh]  md:min-h-[95vh] md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
 
+				{accept && <div className="text-rose-500 max-w-[70vw] text-5xl md:text-6xl text text-center text-wrap yxj-font"> YO </div>}
+				
 				<GifCarrusel gifs={gifs.toArray()} />
 
 				<div className="flex flex-col items-center my-3">
@@ -193,7 +195,7 @@ export default function App() {
 
 					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que no</div>}
 
-					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> Eso si no me lo esperaba </div>}
+					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 
 					<div className={`flex items-center justify-center my-3 ${noIsDisabled && 'animate-shake animate-once'}`}>
 						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
