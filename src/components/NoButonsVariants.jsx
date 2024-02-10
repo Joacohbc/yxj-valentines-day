@@ -26,7 +26,7 @@ export const avoidClickNo = (index, noRef, no) => {
 export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
     let clickTime = 20;
     
-    noRef.innerHTML = ` × Da ${clickTime} para desbloquear el NO ×`;
+    noRef.innerHTML = ` × Da ${clickTime} clics para desbloquear el NO ×`;
     
     const roseColors = {
         50: 'bg-pink-50',
@@ -72,7 +72,7 @@ export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
         }
 
         if (event === 'click') {
-            noRef.innerHTML = ` × Da ${clickTime} para desbloquear el NO ×`;
+            noRef.innerHTML = ` × Da ${clickTime} clics para desbloquear el NO ×`;
             noRef.className = 'max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font ' + colorClass(clickTime);
             clickTime--;
         }
@@ -104,7 +104,7 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
 
     document.getElementById(id).onchange = () => {
         if (document.getElementById(id).value === result.toString()) {
-            noRef.innerHTML = `× Voe que note saltaste las tablas en la escuela ×`;
+            noRef.innerHTML = `× Veo que no te saltaste las tablas en la escuela ×`;
             noRef.onclick = no;
         } else {
             // Change the operation if the result is wrong

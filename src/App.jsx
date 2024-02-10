@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { phrases } from './assets/phrases.js';
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
 import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
+import { YesButton } from "./components/YesButton.jsx";
 
 const totalLives = 8;
 
@@ -54,6 +54,8 @@ function reducer(state, action) {
 
 		case 'RESET':
 			gifs[8].selected = true;
+			localStorage.setItem('lives', 8);
+			localStorage.setItem('accept', false);
 			return { ...state, lives: 8, gifs: gifs, accept: false };
 
 		case 'LOAD': {
@@ -182,25 +184,24 @@ export default function App() {
 		
 	return (
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
-			<div className="flex items-center justify-center flex-col bg-rose-300 md:max-w-full md:h-screen md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
+			<div className="flex items-center justify-center flex-col bg-rose-300 max-w-[95vw] min-h-[80vh]  md:min-h-[95vh] md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
 
 				<GifCarrusel gifs={gifs.toArray()} />
 
 				<div className="flex flex-col items-center my-3">
-					{!accept && lives != 0 && <div className="text-rose-500 text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
+					{!accept && lives != 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-					{!accept && lives == 0 && <div className="text-rose-500 text-3xl md:text-6xl max-w-96 text-wrap text-center yxj-font"> Okey... ya entendí que no</div>}
+					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que no</div>}
 
-					{accept && <div className="text-rose-500 text-3xl md:text-6xl text text-center text-wrap yxj-font">I LOVE YOU</div>}
+					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> Eso si no me lo esperaba </div>}
 
 					<div className={`flex items-center justify-center my-3 ${noIsDisabled && 'animate-shake animate-once'}`}>
-						<LivesBar heart={lives} total={totalLives} />
+						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
 					</div>
 				</div>
 
 				{!accept && lives != 0 && <div className="mb-3">
-					<button className={YES_BUTTON_CLASS}
-						onClick={yes}>o SI o</button>
+					<YesButton onClick={yes}/>
 				</div>}
 
 				{!accept && lives != 0 &&
@@ -212,6 +213,9 @@ export default function App() {
 					<button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"
 						onClick={yes}>o ¿Otra Oportunidad? o</button>
 				</div>}
+
+				{ accept && <button className="text-rose-700 font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font absolute top-0 right-0"
+						onClick={() => dispatch({ type: 'RESET' })}>×</button> }
 			</div>
 		</div>
 	)
