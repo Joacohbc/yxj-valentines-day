@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
 import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 import { YesButton } from "./components/YesButton.jsx";
+import { AlertContext } from "./components/Alert.jsx";
 
 const totalLives = 8;
 
@@ -82,14 +83,14 @@ function reducer(state, action) {
 	}
 }
 
-// TODO: Apenas abrir que muestre un Dialog que explique mas o menos la dinámica del juego (a aparir de la 4 hay retos)
 export default function App() {
-	
+
 	const noRef = useRef(null);
-	const [ noIsDisabled, setNoDisabled ] = useState(false);
 	
-	const [state, dispatch] = useReducer(reducer, initialState);
+	const [ state, dispatch ] = useReducer(reducer, initialState);
 	const { accept, lives, gifs } = state;
+
+	// const { showAlert } = useContext(AlertContext)
 
 	const yes = useCallback(() => {
 		if (accept) return;
@@ -98,6 +99,9 @@ export default function App() {
 			dispatch({ type: 'WIN' });
 			return;
 		}
+
+		// Clear all timeouts of No button
+		for(let i = 0; i < 10000; i++) { clearTimeout(i) }
 
 		dispatch({ type: 'ADD' });
 	}, [accept, lives, dispatch]);
@@ -141,75 +145,68 @@ export default function App() {
 		dispatch({ type: 'LOAD' });
 
 		const currentRef = noRef.current;
-
+		
 		if(lives == 8 && accept) {
 			reset([ 'events' ]);
 			return;
-		} else if(lives == 8) {	
-			currentRef.onclick = avoidClickNo(0, currentRef, no, setNoDisabled);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+		} else if(lives == 8) {
+			currentRef.onclick = avoidClickNo(0, currentRef, no);
 		} else if(lives == 7) {
-			currentRef.onclick = avoidClickNo(1, currentRef, no, setNoDisabled);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			currentRef.onclick = avoidClickNo(1, currentRef, no);
 		} else if(lives == 6) {
-			currentRef.onclick = avoidClickNo(2, currentRef, no, setNoDisabled);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			currentRef.onclick = avoidClickNo(2, currentRef, no);
 		} else if(lives == 5) {
-			currentRef.onclick = avoidClickNo(3, currentRef, no, setNoDisabled);
-			return () => { reset([ 'events', 'style', 'text' ]); }
-		
+			currentRef.onclick = avoidClickNo(3, currentRef, no);
 		} else if(lives == 4) {
-			currentRef.onclick = avoidClickNo4('click', currentRef, no, yes, noIsDisabled, reset);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			// showAlert('4 o', '¿Unos clics rápidos?', true);
+			currentRef.onclick = avoidClickNo4('click', currentRef, no);
 		} else if(lives == 3) {
-			currentRef.onclick = avoidClickNo3('click', currentRef, no, yes, noIsDisabled, reset);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			// showAlert('3 o', '¿Como estas para matemáticas?', true);
+			currentRef.onclick = avoidClickNo3(currentRef, no, yes, reset);
 		} else if(lives == 2) {
-			currentRef.onclick = null;
-			currentRef.onmouseover = avoidClickNo2('enter', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.onmouseout = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchstart = avoidClickNo2('enter', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchend = avoidClickNo2('out', currentRef, no, yes, noIsDisabled, reset);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			// showAlert('2 o', 'Atenta a tus clics!', true);
+			currentRef.onmouseover = avoidClickNo2('enter', currentRef, no, yes, reset);
+			currentRef.onmouseout = avoidClickNo2('out', currentRef, no, yes, reset);
+			currentRef.ontouchstart = avoidClickNo2('enter', currentRef, no, yes, reset);
+			currentRef.ontouchend = avoidClickNo2('out', currentRef, no, yes, reset);
 		} else if(lives == 1) {
-			currentRef.onclick = avoidClickNo1('click', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchstart = avoidClickNo1('enter', currentRef, no, yes, noIsDisabled, reset);
-			currentRef.ontouchend = avoidClickNo1('out', currentRef, no, yes, noIsDisabled, reset);
-			return () => { reset([ 'events', 'style', 'text' ]); }
+			// showAlert('1 o', '¿Un clic más? O se te escapa!', true);
+			currentRef.onclick = avoidClickNo1('click', currentRef, no, reset);
+			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, reset);
+			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, reset);
+			currentRef.ontouchstart = avoidClickNo1('enter', currentRef, no, reset);
+			currentRef.ontouchend = avoidClickNo1('out', currentRef, no, reset);
 		}
 
-	}, [ lives, noRef, no, yes, noIsDisabled, reset, accept ]);
-		
+		return () => { reset([ 'events', 'style', 'text' ]); }
+
+	}, [ lives, noRef, no, yes, reset, accept ]);
+
 	return (
 		<div className='flex items-center justify-center bg-rose-200 min-h-screen bg-image'>
 			<div className="flex items-center justify-center flex-col bg-rose-300 max-w-[95vw] min-h-[80vh]  md:min-h-[95vh] md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
 
-				{accept && <div className="text-rose-500 max-w-[70vw] text-5xl md:text-6xl text text-center text-wrap yxj-font"> YO </div>}
+				{accept && <div className="text-rose-500 max-w-[70vw] text-5xl md:text-6xl text text-center text-wrap yxj-font"> I </div>}
 				
 				<GifCarrusel gifs={gifs.toArray()} />
 
 				<div className="flex flex-col items-center my-3">
 					{!accept && lives != 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que no</div>}
+					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que nO</div>}
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 
-					<div className={`flex items-center justify-center my-3 ${noIsDisabled && 'animate-shake animate-once'}`}>
+					<div className='flex items-center justify-center my-3'>
 						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
 					</div>
 				</div>
 
-				{!accept && lives != 0 && <div className="mb-3">
-					<YesButton onClick={yes}/>
-				</div>}
+				<div className="mb-3">
+					<YesButton onClick={yes} lives={lives} accept={accept}/>
+				</div>
 
-				{!accept && lives != 0 &&
-					<button ref={noRef}
-						className={NO_BUTTON_CLASS(noIsDisabled)}
-						disabled={noIsDisabled}>× NO ×</button>}
+				{!accept && lives != 0 && <button ref={noRef} className={NO_BUTTON_CLASS(false)}>× NO ×</button>}
 
 				{lives == 0 && <div className="pb-3">
 					<button className="bg-sky-200 hover:bg-sky-300 text-black font-bold py-2 px-4 md:py-3 md:px-6 mr-1 rounded-md yxj-font"

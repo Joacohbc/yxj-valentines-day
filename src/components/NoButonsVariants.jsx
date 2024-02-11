@@ -12,7 +12,9 @@ export const avoidClickNo = (index, noRef, no) => {
     if(index == 0) noRef.innerHTML = '× NO ×';
     else noRef.innerHTML = phrases[index - 1].text.toUpperCase();
 
-    return () => {
+    return (e) => {
+        e.stopPropagation();
+
         noRef.className = NO_BUTTON_CLASS(true);
         noRef.onclick = null;
         noRef.innerHTML  = phrases[index].text.toUpperCase();
@@ -23,7 +25,7 @@ export const avoidClickNo = (index, noRef, no) => {
     };
 }
 
-export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
+export const avoidClickNo4 = (event, noRef, no) => {
     let clickTime = 20;
     
     noRef.innerHTML = ` × Da ${clickTime} clics para desbloquear el NO ×`;
@@ -65,7 +67,9 @@ export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
         }
     };
     
-    return () => {
+    return (e) => {
+        e.stopPropagation();
+        
         if(clickTime == 0) {
             noRef.onclick = no;
             return;
@@ -79,7 +83,7 @@ export const avoidClickNo4 = (event, noRef, no, yes, isDisabled, reset) => {
     }
 }
 
-export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
+export const avoidClickNo3 = (noRef, no, yes, reset) => {
     let num1 = Math.floor(Math.random() * 10);
     let num2 = Math.floor(Math.random() * 10 + 1);
     let operation = [ '+', '-', '*' ][Math.floor(Math.random() * 3)];
@@ -98,7 +102,7 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
     noRef.style.transition = 'all 0.2s ease-in-out';
     noRef.onclick = null;
 
-    noRef.innerHTML = `× ${num1} ${operation} ${num2} = <input id=${id} type="number" style="color:black; border: 1px solid gray; padding: 5px; border-radius: 5px;"> ? ×`;
+    noRef.innerHTML = `${num1} ${operation} ${num2} = <input id=${id} style="color:black; border: 1px solid gray; padding: 5px; border-radius: 5px;"> ?`;
     document.getElementById(id).value = 0;
     document.getElementById(id).focus();
 
@@ -108,21 +112,24 @@ export const avoidClickNo3 = (event, noRef, no, yes, isDisabled, reset) => {
             noRef.onclick = no;
         } else {
             // Change the operation if the result is wrong
-            noRef.className = "animate-shake animate-once " + NO_BUTTON_CLASS(isDisabled);
-            avoidClickNo3('click', noRef, no, yes, isDisabled, reset);
+            noRef.className = "animate-shake animate-once " + NO_BUTTON_CLASS(false);
+            avoidClickNo3(noRef, no, yes, reset);
         }
     }
 }
 
-export const avoidClickNo2 = (event, noRef, no, yes, isDisabled, reset) => {
+export const avoidClickNo2 = (event, noRef, no, yes, reset) => {
     let repeatTime = 0;
     
-
     noRef.style.transition = 'all 2.5s ease-in-out';
     noRef.className = "text-black mb-3 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font";
     noRef.innerHTML = 'ALÉJATE DEL NO QUE DESAPARECE! :C';
-    
-    return () => {
+    noRef.onclick = null;
+
+    return (e) => {
+        e.stopPropagation();
+
+        console.log('avoidClickNo2', event, repeatTime);
         if(repeatTime > 5) {
             reset([ 'style', 'event', 'text' ]);
             noRef.onclick = no;
@@ -139,20 +146,21 @@ export const avoidClickNo2 = (event, noRef, no, yes, isDisabled, reset) => {
         }
 
         if (event === 'out') {
-            noRef.className = NO_BUTTON_CLASS(isDisabled);
+            noRef.className = NO_BUTTON_CLASS(false);
             noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.innerHTML = '× NO ×';
-            noRef.onclick = no;
             return;
         }
     }
 }
 
-export const avoidClickNo1 = (event, noRef, no, yes, isDisabled, reset) => {
+export const avoidClickNo1 = (event, noRef, no, reset) => {
     let repeatTime = 0;
     let toutId = null;
 
-    return () => {
+    return (e) => {
+        e.stopPropagation();
+
         if(event == 'enter' && repeatTime > 10) {
             reset([ 'style', 'text', 'event' ]);
             noRef.onclick = no;
@@ -160,7 +168,7 @@ export const avoidClickNo1 = (event, noRef, no, yes, isDisabled, reset) => {
         }
 
         if(event == 'enter' || event == 'click') {
-            noRef.className = NO_BUTTON_CLASS(isDisabled);
+            noRef.className = NO_BUTTON_CLASS(false);
             noRef.style.position = 'absolute';
             noRef.style.left = Math.random() * 95 + '%';
             noRef.style.top = Math.random() * 95 + '%';
