@@ -129,7 +129,7 @@ export const avoidClickNo2 = (event, noRef, no, yes, reset) => {
     return (e) => {
         e.stopPropagation();
 
-        if(repeatTime > 5) {
+        if(repeatTime > 3) {
             reset([ 'style', 'event', 'text' ]);
             noRef.onclick = no;
             return;

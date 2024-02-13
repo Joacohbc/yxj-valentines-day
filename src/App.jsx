@@ -185,7 +185,7 @@ export default function App() {
 			<div className="flex items-center justify-center flex-col bg-rose-300 max-w-[95vw] min-h-[80vh]  md:min-h-[95vh] md:p-5 rounded-lg border-dashed border-2 border-rose-600 animate-fade-up animate-once animate-ease-in-out">
 
 				{accept && <div className="text-rose-500 max-w-[70vw] text-5xl md:text-6xl text text-center text-wrap yxj-font"> I </div>}
-				
+
 				<GifCarrusel gifs={gifs.toArray()} />
 
 				<div className="flex flex-col items-center my-3">
@@ -194,6 +194,7 @@ export default function App() {
 					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Igual yO era demasiadO para ti</div>}
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
+					{accept && <div className="text-rose-500 max-w-[70vw] text-[10px] text text-center text-wrap yxj-font"> {`(No esperaba esperaba un SI pero me hace feliz <3)`} </div>}
 
 					<div className='flex items-center justify-center my-3'>
 						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
