@@ -1,11 +1,9 @@
-import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import LivesBar from "./components/LivesBar.jsx";
 import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
-import { NO_BUTTON_CLASS, YES_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
+import { NO_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 import { YesButton } from "./components/YesButton.jsx";
-import { AlertContext } from "./components/Alert.jsx";
-
 const totalLives = 8;
 
 const initialState = {
@@ -99,7 +97,7 @@ export default function App() {
 			dispatch({ type: 'WIN' });
 			return;
 		}
-
+		
 		// Clear all timeouts of No button
 		for(let i = 0; i < 10000; i++) { clearTimeout(i) }
 
@@ -145,7 +143,7 @@ export default function App() {
 		dispatch({ type: 'LOAD' });
 
 		const currentRef = noRef.current;
-		
+
 		if(lives == 8 && accept) {
 			reset([ 'events' ]);
 			return;
@@ -193,7 +191,7 @@ export default function App() {
 				<div className="flex flex-col items-center my-3">
 					{!accept && lives != 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que nO</div>}
+					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Igual yO era demasiadO para ti</div>}
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 
