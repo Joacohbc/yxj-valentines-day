@@ -191,7 +191,7 @@ export default function App() {
 				<div className="flex flex-col items-center my-3">
 					{!accept && lives != 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl mx-2 text text-center yxj-font">¿Serías mi San Valentín?</div>}
 
-					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Igual yO era demasiadO para ti</div>}
+					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que nO</div>}
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 					{accept && <div className="text-rose-500 max-w-[70vw] text-[10px] text text-center text-wrap yxj-font"> {`(No esperaba esperaba un SI pero me hace feliz <3)`} </div>}
