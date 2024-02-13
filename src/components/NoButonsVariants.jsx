@@ -138,7 +138,7 @@ export const avoidClickNo2 = (event, noRef, no, yes, reset) => {
         if (event === 'enter') {
             noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.className = "mb-2 animate-wiggle animate-once " + YES_BUTTON_CLASS;
-            noRef.innerHTML = 'o TE ENGAÑE, YA NO PUEDES DAR NO! o';
+            noRef.innerHTML = `${'o'.repeat(3 - repeatTime)} SI ${'o'.repeat(3 - repeatTime)}`;
             noRef.onclick = yes;
             repeatTime++;
             return;
@@ -153,9 +153,25 @@ export const avoidClickNo2 = (event, noRef, no, yes, reset) => {
     }
 }
 
+
+function getRandomInt(max, minDiff) {
+    let prevVal = 0;
+    return () => {
+        let val = Math.floor(Math.random() * max);
+        while(Math.abs(val - prevVal) < minDiff) {
+            val = Math.floor(Math.random() * max);
+        }
+        prevVal = val;
+        return val;
+    }
+}
+
 export const avoidClickNo1 = (event, noRef, no, reset) => {
     let repeatTime = 0;
     let toutId = null;
+
+    const getLeft = getRandomInt(95, 10);
+    const getTop = getRandomInt(95, 10);
 
     return (e) => {
         e.stopPropagation();
@@ -169,9 +185,10 @@ export const avoidClickNo1 = (event, noRef, no, reset) => {
         if(event == 'enter' || event == 'click') {
             noRef.className = NO_BUTTON_CLASS(false);
             noRef.style.position = 'absolute';
-            noRef.style.left = Math.random() * 95 + '%';
-            noRef.style.top = Math.random() * 95 + '%';
-            noRef.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+
+            noRef.style.left = getLeft() + '%';
+            noRef.style.top = getTop() + '%';
+            noRef.style.transform = 'rotate(' + Math.random() * 60 + 'deg)';
             noRef.style.transition = 'all 0.2s ease-in-out';
             noRef.innerHTML = 'Intenta otra vez c:';
             noRef.onclick = null;
