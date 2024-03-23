@@ -1,4 +1,4 @@
-import { phrases } from "../assets/phrases";
+import { phrases } from "../phrases.js";
 
 export const YES_BUTTON_CLASS = 'bg-rose-400 hover:bg-red-500 text-rose-100 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font';
 export const NO_BUTTON_CLASS = (isDisabled) => `${!isDisabled ? 'bg-blue-300 hover:bg-blue-400' : 'bg-gray-300'} max-w-sm text-white text-wrap mx-3 mb-2 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font`;
@@ -120,17 +120,25 @@ export const avoidClickNo3 = (noRef, no, yes, reset) => {
 
 export const avoidClickNo2 = (event, noRef, no, yes, reset) => {
     let repeatTime = 0;
+    let start = false;
     
+    noRef.onclick = null;
     noRef.style.transition = 'all 2.5s ease-in-out';
     noRef.className = "text-black mb-3 px-3 md:px-5 py-2 md:py-3 font-bold rounded-md yxj-font";
-    noRef.innerHTML = 'ALÉJATE DEL NO QUE DESAPARECE! :C';
-    noRef.onclick = null;
+    noRef.innerHTML = 'Cuidado con tus clicks! c:';
+    setTimeout(() => {
+        noRef.style.transition = 'all 0.2s ease-in-out';
+        noRef.className = NO_BUTTON_CLASS(false);
+        noRef.innerHTML = '× NO ×';
+        start = true;
+    }, 2400);
 
     return (e) => {
+        if(!start) return;
         e.stopPropagation();
 
-        if(repeatTime > 3) {
-            reset([ 'style', 'event', 'text' ]);
+        if(repeatTime >= 3) {
+            reset([ 'style', 'events', 'text' ]);
             noRef.onclick = no;
             return;
         }
@@ -177,7 +185,7 @@ export const avoidClickNo1 = (event, noRef, no, reset) => {
         e.stopPropagation();
 
         if(event == 'enter' && repeatTime > 15) {
-            reset([ 'style', 'text', 'event' ]);
+            reset([ 'style', 'text', 'events' ]);
             noRef.onclick = no;
             return;
         }
