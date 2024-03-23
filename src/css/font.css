@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'yxj-font';
-  src: url('../assets/Love.woff2') format('woff2'),
+  src: url('/Love.woff2') format('woff2'),
 }
 
 .yxj-font {
