@@ -194,7 +194,6 @@ export default function App() {
 					{!accept && lives == 0 && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text-wrap text-center yxj-font"> Okey... ya entendí que nO</div>}
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
-					{accept && <div className="text-rose-500 max-w-[70vw] text-[10px] text text-center text-wrap yxj-font"> {`(No esperaba esperaba un SI pero me hace feliz <3)`} </div>}
 
 					<div className='flex items-center justify-center my-3'>
 						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
