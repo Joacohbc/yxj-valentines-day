@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import LivesBar from "./components/LivesBar.jsx";
-import './css/font.css';
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
 import { NO_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 import { YesButton } from "./components/YesButton.jsx";
+
 const totalLives = 8;
 
 const initialState = {
@@ -156,19 +156,15 @@ export default function App() {
 		} else if(lives == 5) {
 			currentRef.onclick = avoidClickNo(3, currentRef, no);
 		} else if(lives == 4) {
-			// showAlert('4 o', '¿Unos clics rápidos?', true);
 			currentRef.onclick = avoidClickNo4('click', currentRef, no);
 		} else if(lives == 3) {
-			// showAlert('3 o', '¿Como estas para matemáticas?', true);
 			currentRef.onclick = avoidClickNo3(currentRef, no, yes, reset);
 		} else if(lives == 2) {
-			// showAlert('2 o', 'Atenta a tus clics!', true);
 			currentRef.onmouseover = avoidClickNo2('enter', currentRef, no, yes, reset);
 			currentRef.onmouseout = avoidClickNo2('out', currentRef, no, yes, reset);
 			currentRef.ontouchstart = avoidClickNo2('enter', currentRef, no, yes, reset);
 			currentRef.ontouchend = avoidClickNo2('out', currentRef, no, yes, reset);
 		} else if(lives == 1) {
-			// showAlert('1 o', '¿Un clic más? O se te escapa!', true);
 			currentRef.onclick = avoidClickNo1('click', currentRef, no, reset);
 			currentRef.onmouseover = avoidClickNo1('enter', currentRef, no, reset);
 			currentRef.onmouseout = avoidClickNo1('out', currentRef, no, reset);
