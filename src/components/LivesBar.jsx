@@ -1,9 +1,6 @@
 import Cross from './Cross';
 import Heart from './Heart';
 
-
-import PropTypes from 'prop-types';
-
 const LivesBar = ({ heart, total }) => {
 
   const hearts = Array(heart).fill('o');
@@ -16,11 +13,6 @@ const LivesBar = ({ heart, total }) => {
       {lives.map((e) => e === 'o' ? <Heart key={Math.random()} animated /> : <Cross key={Math.random()} />)}
     </>
   )
-};
-
-LivesBar.propTypes = {
-  heart: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired
 };
 
 export default LivesBar;

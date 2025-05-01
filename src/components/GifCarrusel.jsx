@@ -9,8 +9,6 @@ import gif8 from '/8.gif';
 import lose from '/lose.gif';
 import win from '/win.gif';
 
-import PropTypes from 'prop-types';
-
 // Return an object with all the gifs
 const GIFs = () => {
     const gifs = {
@@ -37,9 +35,5 @@ const GifCarrusel = ({ gifs }) => {
         </div>
     )
 }
-
-GifCarrusel.propTypes = {
-    gifs: PropTypes.array.isRequired
-};
 
 export { GIFs, GifCarrusel };
