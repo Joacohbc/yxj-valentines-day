@@ -1,39 +1,20 @@
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import LivesBar from "./components/LivesBar.jsx";
-import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
+import { GifCarrusel, createGifsSelection } from "./components/GifCarrusel.jsx";
 import { NO_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 import { YesButton } from "./components/YesButton.jsx";
 import { createLocalStorageManager } from "./utils/LocalStorageManager.js";
 
-
+const TOTAL_HEARTS = 8;
 const localStorageManager = createLocalStorageManager(8);
+const GIFsManager = createGifsSelection(8);
 
-const totalLives = 8;
-
-// Helper to update GIFs state based on lives and accept status
-// Assumes GIFs() returns an object where keys are numbers (lives), 'win', 'lose'
-// and values have a 'selected' boolean property.
-const updateGifsSelection = (lives, accept) => {
-	const newGifs = GIFs(); // Get a fresh set of GIFs with default selections (all false)
-	if (accept) {
-		if (newGifs.win) newGifs.win.selected = true;
-	} else if (lives === 0) {
-		if (newGifs.lose) newGifs.lose.selected = true;
-	} else if (lives > 0 && lives <= totalLives) {
-		if (newGifs[lives]) newGifs[lives].selected = true;
-	} else {
-		// Handle potential edge cases or default state if necessary
-		// e.g., if lives is somehow out of expected range but not 0 or win state
-		if (newGifs[totalLives]) newGifs[totalLives].selected = true; // Default to initial state gif
-	}
-	return newGifs;
-};
 
 // Define initial state structure - actual values will be set by LOAD or defaults
 const initialState = {
 	accept: false,
-	lives: totalLives,
-	gifs: updateGifsSelection(totalLives, false) // Start with default GIF selection
+	lives: TOTAL_HEARTS,
+	gifs: GIFsManager(TOTAL_HEARTS, false), // Initial GIFs based on total lives and accept status
 };
 
 // Reducer function optimized for clarity and reduced redundancy
@@ -43,15 +24,15 @@ function reducer(state, action) {
 
 	switch (action.type) {
 		case 'WIN':
-			lives = totalLives;
+			lives = TOTAL_HEARTS;
 			accept = true;
 			break;
 
 		case 'ADD':
 			// Prevent exceeding total lives unless it triggers a win
-			lives = Math.min(state.lives + 1, totalLives);
+			lives = Math.min(state.lives + 1, TOTAL_HEARTS);
 			// If adding a life reaches the total, it's a win
-			accept = lives === totalLives;
+			accept = lives === TOTAL_HEARTS;
 			break;
 
 		case 'REMOVE':
@@ -73,17 +54,17 @@ function reducer(state, action) {
 			return { ...state, accept: false };
 
 		case 'RESET':
-			lives = totalLives;
+			lives = TOTAL_HEARTS;
 			accept = false;
 			break;
 
 		case 'LOAD': {
 			const loadedState = localStorageManager.load();
 			// Ensure consistency: if loaded accept is true, lives must be totalLives
-			if (loadedState.accept && loadedState.lives !== totalLives) {
-				loadedState.lives = totalLives;
+			if (loadedState.accept && loadedState.lives !== TOTAL_HEARTS) {
+				loadedState.lives = TOTAL_HEARTS;
 			}
-			const loadedGifs = updateGifsSelection(loadedState.lives, loadedState.accept);
+			const loadedGifs = GIFsManager(loadedState.lives, loadedState.accept);
 			return { ...state, ...loadedState, gifs: loadedGifs };
 		}
 		default:
@@ -93,7 +74,7 @@ function reducer(state, action) {
 
 	// For actions that change lives/accept, update localStorage and gifs
 	localStorageManager.save(lives, accept);
-	const updatedGifs = updateGifsSelection(lives, accept);
+	const updatedGifs = GIFsManager(lives, accept);
 
 	// Return the new state
 	return { ...state, lives, accept, gifs: updatedGifs };
@@ -111,7 +92,7 @@ export default function App() {
 	const yes = useCallback(() => {
 		if (accept) return;
 
-		if (lives === totalLives) {
+		if (lives === TOTAL_HEARTS) {
 			dispatch({ type: 'WIN' });
 			return;
 		}
@@ -210,7 +191,7 @@ export default function App() {
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 
       				{/* Math.random() is used to force the re-render of the component (to sync the animation) */}
-					<LivesBar key={Math.random()} heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
+					<LivesBar key={Math.random()} heart={!accept ? lives : 1} total={!accept ? TOTAL_HEARTS : 1} />
 				</div>
 
 				<div className="mb-3">

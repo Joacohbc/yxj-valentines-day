@@ -10,23 +10,53 @@ import lose from '/lose.gif';
 import win from '/win.gif';
 
 // Return an object with all the gifs
-const GIFs = () => {
+const getAllGIFs = () => {
     const gifs = {
         lose: { url: lose, title: 'Lose </3', selected: false },
-        1: { url: gif1, title: 'San Valentin <3', selected: false},
-        2: { url: gif2, title: 'San Valentin <3', selected: false }, 
-        3: { url: gif3, title: 'San Valentin <3', selected: false }, 
-        4: { url: gif4, title: 'San Valentin <3', selected: false }, 
-        5: { url: gif5, title: 'San Valentin <3', selected: false }, 
-        6: { url: gif6, title: 'San Valentin <3', selected: false }, 
-        7: { url: gif7, title: 'San Valentin <3', selected: false }, 
-        8: { url: gif8, title: 'San Valentin <3', selected: false }, 
         win: { url: win, title: 'Win <3', selected: false },
+        1: { url: gif1, title: 'San Valentin <3', index: 1, selected: false},
+        2: { url: gif2, title: 'San Valentin <3', index: 2, selected: false }, 
+        3: { url: gif3, title: 'San Valentin <3', index: 3, selected: false }, 
+        4: { url: gif4, title: 'San Valentin <3', index: 4, selected: false }, 
+        5: { url: gif5, title: 'San Valentin <3', index: 5, selected: false }, 
+        6: { url: gif6, title: 'San Valentin <3', index: 6, selected: false }, 
+        7: { url: gif7, title: 'San Valentin <3', index: 7, selected: false }, 
+        8: { url: gif8, title: 'San Valentin <3', index: 8, selected: false }, 
+        toArray: function() {
+            return Object.values(this);
+        },
     };
     
-    gifs.toArray = () => Object.values(gifs);
     return gifs;
 }
+
+// Helper to update ALL_GIFs state based on lives and accept status
+// Assumes ALL_GIFs() returns an object where keys are numbers (lives), 'win', 'lose'
+// and values have a 'selected' boolean property.
+const createGifsSelection = (totalLives) => {
+    const internalTotalLives = totalLives || 8;
+    const gifs = getAllGIFs();
+    
+    return (lives, accept) => {
+
+        // Reset all gifs to unselected
+        gifs.toArray().forEach(gif => {
+            gif.selected = false;
+        })
+
+        if (accept) {
+            gifs.win.selected = true;
+        } else if (lives === 0) {
+            gifs.lose.selected = true;
+        } else if (lives > 0 && lives <= internalTotalLives) {
+            gifs[lives].selected = true;
+        } else {
+            if (gifs[internalTotalLives]) gifs[internalTotalLives].selected = true; // Default to initial state gif
+        }
+
+        return gifs;
+    }
+};
 
 const GifCarrusel = ({ gifs }) => {
     return (
@@ -36,4 +66,4 @@ const GifCarrusel = ({ gifs }) => {
     )
 }
 
-export { GIFs, GifCarrusel };
+export { getAllGIFs, createGifsSelection, GifCarrusel };
