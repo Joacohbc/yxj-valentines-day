@@ -3,82 +3,100 @@ import LivesBar from "./components/LivesBar.jsx";
 import { GIFs, GifCarrusel } from "./components/GifCarrusel.jsx";
 import { NO_BUTTON_CLASS, avoidClickNo, avoidClickNo1, avoidClickNo2, avoidClickNo3, avoidClickNo4 } from "./components/NoButonsVariants.jsx";
 import { YesButton } from "./components/YesButton.jsx";
+import { createLocalStorageManager } from "./utils/LocalStorageManager.js";
+
+
+const localStorageManager = createLocalStorageManager(8);
 
 const totalLives = 8;
 
+// Helper to update GIFs state based on lives and accept status
+// Assumes GIFs() returns an object where keys are numbers (lives), 'win', 'lose'
+// and values have a 'selected' boolean property.
+const updateGifsSelection = (lives, accept) => {
+	const newGifs = GIFs(); // Get a fresh set of GIFs with default selections (all false)
+	if (accept) {
+		if (newGifs.win) newGifs.win.selected = true;
+	} else if (lives === 0) {
+		if (newGifs.lose) newGifs.lose.selected = true;
+	} else if (lives > 0 && lives <= totalLives) {
+		if (newGifs[lives]) newGifs[lives].selected = true;
+	} else {
+		// Handle potential edge cases or default state if necessary
+		// e.g., if lives is somehow out of expected range but not 0 or win state
+		if (newGifs[totalLives]) newGifs[totalLives].selected = true; // Default to initial state gif
+	}
+	return newGifs;
+};
+
+// Define initial state structure - actual values will be set by LOAD or defaults
 const initialState = {
 	accept: false,
 	lives: totalLives,
-	gifs: GIFs()
+	gifs: updateGifsSelection(totalLives, false) // Start with default GIF selection
 };
 
+// Reducer function optimized for clarity and reduced redundancy
 function reducer(state, action) {
-	// Reset the selected gif
-	const gifs = GIFs();
+	let lives = state.lives;
+	let accept = state.accept;
 
 	switch (action.type) {
-		case 'WIN': {
-			gifs.win.selected = true;
-			localStorage.setItem('lives', 8);
-			localStorage.setItem('accept', true);
-			return { ...state, lives: 8, gifs: gifs, accept: true };
-		}
+		case 'WIN':
+			lives = totalLives;
+			accept = true;
+			break;
 
-		case 'ADD': {
-			const lives = state.lives + 1 > totalLives ? totalLives : state.lives + 1;
-			gifs[lives].selected = true;
-			localStorage.setItem('lives', lives);
-			localStorage.setItem('accept', false);
-			return { ...state, lives: lives, gifs: gifs, accept: false };
-		}
+		case 'ADD':
+			// Prevent exceeding total lives unless it triggers a win
+			lives = Math.min(state.lives + 1, totalLives);
+			// If adding a life reaches the total, it's a win
+			accept = lives === totalLives;
+			break;
 
-		case 'REMOVE': {
-			const lives = state.lives - 1 > 0 ? state.lives - 1 : 0;
-			gifs[lives].selected = true;
-			localStorage.setItem('lives', lives);
-			localStorage.setItem('accept', false);
-			return { ...state, lives: lives, gifs: gifs, accept: false };
-		}
+		case 'REMOVE':
+			lives = Math.max(state.lives - 1, 0);
+			accept = false; // Cannot be accepted if a life was just removed
+			break;
 
-		case 'LOSE': {
-			gifs.lose.selected = true;
-			localStorage.setItem('lives', 0);
-			localStorage.setItem('accept', false);
-			return { ...state, lives: 0, gifs: gifs, accept: false };
-		}
+		case 'LOSE':
+			lives = 0;
+			accept = false;
+			break;
 
 		case 'NO_ACCEPT':
+			// Only flips the accept flag, doesn't change lives
+			// Used when 'No' is clicked after already accepting
+			accept = false;
+			 // No localStorage update here as per original logic for this specific case
+			 // No GIF update needed as lives haven't changed
 			return { ...state, accept: false };
 
-
 		case 'RESET':
-			gifs[8].selected = true;
-			localStorage.setItem('lives', 8);
-			localStorage.setItem('accept', false);
-			return { ...state, lives: 8, gifs: gifs, accept: false };
+			lives = totalLives;
+			accept = false;
+			break;
 
 		case 'LOAD': {
-			const totalLives = 8;
-			const lsAccept = localStorage.getItem('accept') === 'true';
-			const lsLives = localStorage.getItem('lives') ? parseInt(localStorage.getItem('lives')) : totalLives;
-
-			if (lsAccept) {
-				gifs.win.selected = true;
+			const loadedState = localStorageManager.load();
+			// Ensure consistency: if loaded accept is true, lives must be totalLives
+			if (loadedState.accept && loadedState.lives !== totalLives) {
+				loadedState.lives = totalLives;
 			}
-
-			if (!lsAccept && lsLives == 0) {
-				gifs.lose.selected = true;
-			}
-
-			if (lsLives > 0 && lsLives <= totalLives && !lsAccept) {
-				gifs[lsLives].selected = true;
-			}
-
-			return { accept: lsAccept, lives: lsLives, gifs: gifs };
+			const loadedGifs = updateGifsSelection(loadedState.lives, loadedState.accept);
+			return { ...state, ...loadedState, gifs: loadedGifs };
 		}
 		default:
+			// Return current state if action type is unknown
 			return state;
 	}
+
+	// For actions that change lives/accept, update localStorage and gifs
+	localStorageManager.save(lives, accept);
+	const updatedGifs = updateGifsSelection(lives, accept);
+
+	// Return the new state
+	return { ...state, lives, accept, gifs: updatedGifs };
 }
 
 export default function App() {
