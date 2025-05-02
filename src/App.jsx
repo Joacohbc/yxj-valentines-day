@@ -9,7 +9,6 @@ const TOTAL_HEARTS = 8;
 const localStorageManager = createLocalStorageManager(8);
 const GIFsManager = createGifsSelection(8);
 
-
 // Define initial state structure - actual values will be set by LOAD or defaults
 const initialState = {
 	accept: false,
@@ -46,11 +45,7 @@ function reducer(state, action) {
 			break;
 
 		case 'NO_ACCEPT':
-			// Only flips the accept flag, doesn't change lives
-			// Used when 'No' is clicked after already accepting
 			accept = false;
-			 // No localStorage update here as per original logic for this specific case
-			 // No GIF update needed as lives haven't changed
 			return { ...state, accept: false };
 
 		case 'RESET':
@@ -83,11 +78,8 @@ function reducer(state, action) {
 export default function App() {
 
 	const noRef = useRef(null);
-	
 	const [ state, dispatch ] = useReducer(reducer, initialState);
 	const { accept, lives, gifs } = state;
-
-	// const { showAlert } = useContext(AlertContext)
 
 	const yes = useCallback(() => {
 		if (accept) return;
