@@ -191,9 +191,8 @@ export default function App() {
 
 					{accept && <div className="text-rose-500 max-w-[70vw] text-3xl md:text-6xl text text-center text-wrap yxj-font"> VERY MUCHITO </div>}
 
-					<div className='flex items-center justify-center my-3'>
-						<LivesBar heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
-					</div>
+      				{/* Math.random() is used to force the re-render of the component (to sync the animation) */}
+					<LivesBar key={Math.random()} heart={!accept ? lives : 1} total={!accept ? totalLives : 1} />
 				</div>
 
 				<div className="mb-3">

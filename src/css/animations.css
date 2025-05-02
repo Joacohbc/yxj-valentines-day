@@ -1,0 +1,7 @@
+.vibrate-3 {
+	animation: vibrate-3 0.5s linear infinite both;
+}
+
+.shake-horizontal {
+	animation: shake-horizontal 1s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
+}
