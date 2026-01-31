@@ -14,8 +14,6 @@
 
 ---
 
-## 🌟 El Proyecto
-
 Este repositorio contiene una página web interactiva para San Valentín. El objetivo es ofrecer una declaración romántica visualmente atractiva. El sitio utiliza componentes dinámicos para guiar al usuario a través de una propuesta, utilizando animaciones y lógica personalizada para crear un momento inolvidable.
 
 ## ✨ Características Principales
